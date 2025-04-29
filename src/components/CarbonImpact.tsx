@@ -2,7 +2,7 @@
 import React from 'react';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Leaf, Tree, CloudSun } from 'lucide-react';
+import { Leaf, TreeDeciduous, CloudSun } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface CarbonImpactProps {
@@ -63,7 +63,7 @@ const CarbonImpact = ({ totalSaved, swapCount, level, points }: CarbonImpactProp
       <div className="grid grid-cols-2 gap-4">
         <Card className="bg-swapx-green/30">
           <CardContent className="p-4 flex flex-col items-center">
-            <Tree className="h-8 w-8 text-green-600 mb-2" />
+            <TreeDeciduous className="h-8 w-8 text-green-600 mb-2" />
             <p className="font-bold text-xl">{treesEquivalent}</p>
             <p className="text-xs text-center">Trees planted for a month</p>
           </CardContent>
