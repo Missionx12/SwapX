@@ -9,7 +9,133 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      book_likes: {
+        Row: {
+          book_id: string | null
+          created_at: string | null
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          book_id?: string | null
+          created_at?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          book_id?: string | null
+          created_at?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "book_likes_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      books: {
+        Row: {
+          author: string | null
+          carbon_saving: number | null
+          condition: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          is_available: boolean | null
+          owner_id: string | null
+          title: string
+        }
+        Insert: {
+          author?: string | null
+          carbon_saving?: number | null
+          condition?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_available?: boolean | null
+          owner_id?: string | null
+          title: string
+        }
+        Update: {
+          author?: string | null
+          carbon_saving?: number | null
+          condition?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_available?: boolean | null
+          owner_id?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      Books: {
+        Row: {
+          author: string | null
+          id: string
+          status: string | null
+          tittle: string
+        }
+        Insert: {
+          author?: string | null
+          id?: string
+          status?: string | null
+          tittle?: string
+        }
+        Update: {
+          author?: string | null
+          id?: string
+          status?: string | null
+          tittle?: string
+        }
+        Relationships: []
+      }
+      swap_requests: {
+        Row: {
+          book_id: string | null
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          owner_id: string | null
+          requester_id: string | null
+          status: string | null
+        }
+        Insert: {
+          book_id?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          owner_id?: string | null
+          requester_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          book_id?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          owner_id?: string | null
+          requester_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "swap_requests_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

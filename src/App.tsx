@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { NavigationProvider } from "./context/NavigationContext";
 import Index from "./pages/Index";
 import Browse from "./pages/Browse";
 import AddBook from "./pages/AddBook";
@@ -13,20 +14,26 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const AppRoutes = () => (
+  <Routes>
+    <Route path="/" element={<Index />} />
+    <Route path="/browse" element={<Browse />} />
+    <Route path="/add" element={<AddBook />} />
+    <Route path="/impact" element={<Impact />} />
+    <Route path="/profile" element={<Profile />} />
+    <Route path="*" element={<NotFound />} />
+  </Routes>
+);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/browse" element={<Browse />} />
-          <Route path="/add" element={<AddBook />} />
-          <Route path="/impact" element={<Impact />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <NavigationProvider>
+          <AppRoutes />
+        </NavigationProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

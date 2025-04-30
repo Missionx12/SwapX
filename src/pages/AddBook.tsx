@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,32 +20,105 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { addBook } from '@/services/bookService';
+import { v4 as uuidv4 } from 'uuid';
 
 const AddBook = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Form state
+  const [title, setTitle] = useState('');
+  const [author, setAuthor] = useState('');
+  const [condition, setCondition] = useState<string>('');
+  const [description, setDescription] = useState('');
+  
+  // Sample image URLs for demo
+  const sampleImageUrls = [
+    'https://images.unsplash.com/photo-1543002588-bfa74002ed7e',
+    'https://images.unsplash.com/photo-1512820790803-83ca734da794',
+    'https://images.unsplash.com/photo-1544947950-fa07a98d237f',
+    'https://images.unsplash.com/photo-1532012197267-da84d127e765'
+  ];
+  
+  // Calculate carbon saving based on condition
+  const calculateCarbonSaving = (bookCondition: string): number => {
+    switch (bookCondition) {
+      case 'Like New': return 2.8;
+      case 'Good': return 2.3;
+      case 'Fair': return 1.9;
+      case 'Well Used': return 1.7;
+      default: return 2.0;
+    }
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Simulate successful book addition
-    toast({
-      title: "Book added successfully!",
-      description: "Your book listing has been created and is now visible to others.",
-    });
-    
-    // Show carbon impact toast after a delay
-    setTimeout(() => {
+    if (!title) {
       toast({
-        title: "Carbon Impact",
-        description: "By listing this book, you could save up to 2.8 kg of CO₂!",
-        className: "bg-swapx-green border-green-400",
+        title: "Missing information",
+        description: "Please enter a book title.",
+        variant: "destructive",
       });
-    }, 1500);
+      return;
+    }
     
-    // Navigate to browse
-    setTimeout(() => navigate('/browse'), 2500);
+    if (!condition) {
+      toast({
+        title: "Missing information",
+        description: "Please select a book condition.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      // For demo purposes, we'll use a random image URL
+      const randomImageUrl = sampleImageUrls[Math.floor(Math.random() * sampleImageUrls.length)];
+      
+      // Create the book in Supabase
+      await addBook({
+        title,
+        author,
+        description,
+        condition,
+        image_url: randomImageUrl,
+        owner_id: uuidv4(), // Temporary owner ID for now
+        carbon_saving: calculateCarbonSaving(condition),
+      });
+      
+      // Show success toast
+      toast({
+        title: "Book added successfully!",
+        description: "Your book listing has been created and is now visible to others.",
+      });
+      
+      // Show carbon impact toast after a delay
+      setTimeout(() => {
+        toast({
+          title: "Carbon Impact",
+          description: `By listing this book, you could save up to ${calculateCarbonSaving(condition)} kg of CO₂!`,
+          className: "bg-swapx-green border-green-400",
+        });
+      }, 1500);
+      
+      // Navigate to browse
+      setTimeout(() => navigate('/browse'), 2500);
+    } catch (error) {
+      console.error('Error adding book:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add book. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -81,25 +154,39 @@ const AddBook = () => {
             <label htmlFor="title" className="text-sm font-medium flex items-center gap-2">
               <BookOpen className="h-4 w-4" /> Title
             </label>
-            <Input id="title" placeholder="Enter book title" />
+            <Input 
+              id="title" 
+              placeholder="Enter book title" 
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
           </div>
           
           <div className="space-y-2">
             <label htmlFor="author" className="text-sm font-medium">Author</label>
-            <Input id="author" placeholder="Enter author name" />
+            <Input 
+              id="author" 
+              placeholder="Enter author name" 
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
+            />
           </div>
           
           <div className="space-y-2">
             <label htmlFor="condition" className="text-sm font-medium">Condition</label>
-            <Select>
+            <Select
+              value={condition}
+              onValueChange={setCondition}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select condition" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="like-new">Like New</SelectItem>
-                <SelectItem value="good">Good</SelectItem>
-                <SelectItem value="fair">Fair</SelectItem>
-                <SelectItem value="well-used">Well Used</SelectItem>
+                <SelectItem value="Like New">Like New</SelectItem>
+                <SelectItem value="Good">Good</SelectItem>
+                <SelectItem value="Fair">Fair</SelectItem>
+                <SelectItem value="Well Used">Well Used</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -108,7 +195,13 @@ const AddBook = () => {
             <label htmlFor="description" className="text-sm font-medium flex items-center gap-2">
               <Info className="h-4 w-4" /> Description
             </label>
-            <Textarea id="description" placeholder="Brief description of the book" rows={3} />
+            <Textarea 
+              id="description" 
+              placeholder="Brief description of the book" 
+              rows={3} 
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
           </div>
         </div>
         
@@ -117,12 +210,18 @@ const AddBook = () => {
           <Leaf className="h-10 w-10 text-green-600 flex-shrink-0" />
           <div>
             <p className="font-medium">Potential Carbon Impact</p>
-            <p className="text-sm text-muted-foreground">Approx. 2.8 kg CO₂ saved if swapped</p>
+            <p className="text-sm text-muted-foreground">
+              Approx. {condition ? calculateCarbonSaving(condition) : 2.0} kg CO₂ saved if swapped
+            </p>
           </div>
         </div>
         
-        <Button type="submit" className="w-full bg-swapx-purple hover:bg-swapx-purple/90">
-          List Book
+        <Button 
+          type="submit" 
+          className="w-full bg-swapx-purple hover:bg-swapx-purple/90"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Adding Book...' : 'List Book'}
         </Button>
       </form>
 
