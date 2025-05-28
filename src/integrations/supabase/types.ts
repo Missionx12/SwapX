@@ -6,135 +6,112 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export type Database = {
+export interface Database {
   public: {
     Tables: {
-      book_likes: {
-        Row: {
-          book_id: string | null
-          created_at: string | null
-          id: string
-          user_id: string | null
-        }
-        Insert: {
-          book_id?: string | null
-          created_at?: string | null
-          id?: string
-          user_id?: string | null
-        }
-        Update: {
-          book_id?: string | null
-          created_at?: string | null
-          id?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "book_likes_book_id_fkey"
-            columns: ["book_id"]
-            isOneToOne: false
-            referencedRelation: "books"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       books: {
         Row: {
-          author: string | null
-          carbon_saving: number | null
-          condition: string | null
-          created_at: string | null
-          description: string | null
           id: string
+          created_at: string
+          title: string
+          description: string
           image_url: string | null
-          is_available: boolean | null
-          owner_id: string | null
-          title: string
+          owner_id: string
+          carbon_saving: number
+          tags: string[]
         }
         Insert: {
-          author?: string | null
-          carbon_saving?: number | null
-          condition?: string | null
-          created_at?: string | null
-          description?: string | null
           id?: string
-          image_url?: string | null
-          is_available?: boolean | null
-          owner_id?: string | null
+          created_at?: string
           title: string
+          description: string
+          image_url?: string | null
+          owner_id: string
+          carbon_saving: number
+          tags: string[]
         }
         Update: {
-          author?: string | null
-          carbon_saving?: number | null
-          condition?: string | null
-          created_at?: string | null
-          description?: string | null
           id?: string
-          image_url?: string | null
-          is_available?: boolean | null
-          owner_id?: string | null
+          created_at?: string
           title?: string
+          description?: string
+          image_url?: string | null
+          owner_id?: string
+          carbon_saving?: number
+          tags?: string[]
         }
-        Relationships: []
       }
-      Books: {
+      likes: {
         Row: {
-          author: string | null
           id: string
-          status: string | null
-          tittle: string
+          created_at: string
+          liker_id: string
+          liked_book_id: string
         }
         Insert: {
-          author?: string | null
           id?: string
-          status?: string | null
-          tittle?: string
+          created_at?: string
+          liker_id: string
+          liked_book_id: string
         }
         Update: {
-          author?: string | null
           id?: string
-          status?: string | null
-          tittle?: string
+          created_at?: string
+          liker_id?: string
+          liked_book_id?: string
         }
-        Relationships: []
       }
-      swap_requests: {
+      matches: {
         Row: {
-          book_id: string | null
-          completed_at: string | null
-          created_at: string | null
           id: string
-          owner_id: string | null
-          requester_id: string | null
-          status: string | null
+          created_at: string
+          user1_id: string
+          user2_id: string
+          book1_id: string
+          book2_id: string
         }
         Insert: {
-          book_id?: string | null
-          completed_at?: string | null
-          created_at?: string | null
           id?: string
-          owner_id?: string | null
-          requester_id?: string | null
-          status?: string | null
+          created_at?: string
+          user1_id: string
+          user2_id: string
+          book1_id: string
+          book2_id: string
         }
         Update: {
-          book_id?: string | null
-          completed_at?: string | null
-          created_at?: string | null
           id?: string
-          owner_id?: string | null
-          requester_id?: string | null
-          status?: string | null
+          created_at?: string
+          user1_id?: string
+          user2_id?: string
+          book1_id?: string
+          book2_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "swap_requests_book_id_fkey"
-            columns: ["book_id"]
-            isOneToOne: false
-            referencedRelation: "books"
-            referencedColumns: ["id"]
-          },
-        ]
+      }
+      messages: {
+        Row: {
+          id: string
+          created_at: string
+          match_id: string
+          sender_id: string
+          content: string
+          read: boolean
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          match_id: string
+          sender_id: string
+          content: string
+          read?: boolean
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          match_id?: string
+          sender_id?: string
+          content?: string
+          read?: boolean
+        }
       }
     }
     Views: {
@@ -144,9 +121,6 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
       [_ in never]: never
     }
   }

@@ -1,19 +1,24 @@
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Navigation from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, Trophy, Share2, Award } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { userImpact, achievements } from '@/lib/mockData';
 import CarbonImpact from '@/components/CarbonImpact';
 import AchievementBadge from '@/components/AchievementBadge';
+import { supabase } from '@/integrations/supabase/client';
 
 // Dynamic icon component
 import * as LucideIcons from 'lucide-react';
 
 const Impact = () => {
   const navigate = useNavigate();
-  
+  const [impact, setImpact] = useState({ totalSaved: 0, swapCount: 0, level: 1, points: 0 });
+  const [achievements, setAchievements] = useState([]);
+
+  useEffect(() => {
+    // TODO: Fetch real impact and achievements from Supabase
+  }, []);
+
   // Function to dynamically get icon from name
   const getIcon = (iconName: string, size: number = 24) => {
     const Icon = (LucideIcons as any)[iconName] || LucideIcons.HelpCircle;
@@ -38,10 +43,10 @@ const Impact = () => {
       {/* Carbon Impact */}
       <section className="p-6">
         <CarbonImpact 
-          totalSaved={userImpact.totalSaved}
-          swapCount={userImpact.swapCount}
-          level={userImpact.level}
-          points={userImpact.points}
+          totalSaved={impact.totalSaved}
+          swapCount={impact.swapCount}
+          level={impact.level}
+          points={impact.points}
         />
       </section>
 
@@ -52,7 +57,8 @@ const Impact = () => {
           Achievements
         </h2>
         <div className="grid grid-cols-2 gap-4">
-          {achievements.map((achievement) => (
+          {/* TODO: Map real achievements from Supabase */}
+          {achievements.map((achievement: any) => (
             <AchievementBadge
               key={achievement.id}
               title={achievement.title}

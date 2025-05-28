@@ -1,16 +1,33 @@
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Navigation from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Leaf, BookOpenText, Waypoints, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { mockBooks, userImpact } from '@/lib/mockData';
 import BookItem from '@/components/BookItem';
 import CarbonImpact from '@/components/CarbonImpact';
+import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const navigate = useNavigate();
-  const featuredBooks = mockBooks.slice(0, 3);
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [impact, setImpact] = useState({ totalSaved: 0, swapCount: 0, level: 1, points: 0 });
+
+  useEffect(() => {
+    const fetchBooks = async () => {
+      setLoading(true);
+      const user = (await supabase.auth.getSession()).data.session?.user;
+      const { data, error } = await supabase
+        .from('books')
+        .select('*')
+        .neq('owner_id', user?.id)
+        .order('created_at', { ascending: false });
+      if (!error) setBooks(data || []);
+      setLoading(false);
+    };
+    fetchBooks();
+    // TODO: Fetch real impact data from Supabase or calculate
+  }, []);
 
   return (
     <div className="min-h-screen pb-20">
@@ -57,10 +74,10 @@ const Index = () => {
           </Button>
         </div>
         <CarbonImpact 
-          totalSaved={userImpact.totalSaved}
-          swapCount={userImpact.swapCount}
-          level={userImpact.level}
-          points={userImpact.points}
+          totalSaved={impact.totalSaved}
+          swapCount={impact.swapCount}
+          level={impact.level}
+          points={impact.points}
         />
       </section>
 
@@ -75,11 +92,15 @@ const Index = () => {
             See all <ChevronRight size={16} />
           </Button>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          {featuredBooks.map((book) => (
-            <BookItem key={book.id} {...book} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex justify-center items-center h-32">Loading...</div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            {books.map((book) => (
+              <BookItem key={book.id} {...book} />
+            ))}
+          </div>
+        )}
       </section>
 
       <Navigation />
