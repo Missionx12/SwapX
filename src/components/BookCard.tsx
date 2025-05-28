@@ -5,15 +5,12 @@ import { useToast } from '@/hooks/use-toast';
 import { likeBook, checkMatch } from '@/services/interactionService';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import type { Database } from '@/integrations/supabase/types';
+
+type Book = Database['public']['Tables']['books']['Row'];
 
 interface BookCardProps {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl: string | null;
-  ownerId: string;
-  carbonSaving: number;
-  tags: string[];
+  book: Book;
   isLiked?: boolean;
   isMatched?: boolean;
   onLike?: () => void;
@@ -21,13 +18,7 @@ interface BookCardProps {
 }
 
 const BookCard: React.FC<BookCardProps> = ({
-  id,
-  title,
-  description,
-  imageUrl,
-  ownerId,
-  carbonSaving,
-  tags,
+  book,
   isLiked = false,
   isMatched = false,
   onLike,
@@ -52,10 +43,10 @@ const BookCard: React.FC<BookCardProps> = ({
 
     setIsLiking(true);
     try {
-      await likeBook(user.id, id);
+      await likeBook(user.id, book.id);
       
       // Check for a match
-      const match = await checkMatch(user.id, id);
+      const match = await checkMatch(user.id, book.id);
       
       if (match) {
         toast({
@@ -84,17 +75,17 @@ const BookCard: React.FC<BookCardProps> = ({
   };
 
   const handleChat = () => {
-    navigate(`/chat/${id}`);
+    navigate(`/chat/${book.id}`);
   };
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
       {/* Book Image */}
       <div className="relative aspect-[3/4] bg-gray-100">
-        {imageUrl ? (
+        {book.image_url ? (
           <img
-            src={imageUrl}
-            alt={title}
+            src={book.image_url}
+            alt={book.title}
             className="w-full h-full object-cover"
           />
         ) : (
@@ -105,18 +96,18 @@ const BookCard: React.FC<BookCardProps> = ({
         
         {/* Carbon Impact Badge */}
         <div className="absolute top-2 right-2 bg-swapx-green text-white px-2 py-1 rounded-full text-xs font-medium">
-          {carbonSaving} kg CO₂
+          {book.carbon_saving} kg CO₂
         </div>
       </div>
 
       {/* Book Info */}
       <div className="p-4">
-        <h3 className="font-semibold text-lg mb-1 line-clamp-1">{title}</h3>
-        <p className="text-gray-600 text-sm mb-2 line-clamp-2">{description}</p>
+        <h3 className="font-semibold text-lg mb-1 line-clamp-1">{book.title}</h3>
+        <p className="text-gray-600 text-sm mb-2 line-clamp-2">{book.description}</p>
         
         {/* Tags */}
         <div className="flex flex-wrap gap-1 mb-3">
-          {tags.map((tag, index) => (
+          {book.tags.map((tag, index) => (
             <span
               key={index}
               className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs"
@@ -132,7 +123,7 @@ const BookCard: React.FC<BookCardProps> = ({
             variant={isLiked ? "default" : "outline"}
             className={`flex-1 ${isLiked ? 'bg-swapx-purple hover:bg-swapx-purple/90' : ''}`}
             onClick={handleLike}
-            disabled={isLiking || isLiked || ownerId === user?.id}
+            disabled={isLiking || isLiked || book.owner_id === user?.id}
           >
             <Heart className={`w-4 h-4 mr-2 ${isLiked ? 'fill-current' : ''}`} />
             {isLiked ? 'Liked' : 'Like'}

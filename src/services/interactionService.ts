@@ -4,6 +4,7 @@ import { Database } from '@/integrations/supabase/types';
 type Like = Database['public']['Tables']['likes']['Row'];
 type Match = Database['public']['Tables']['matches']['Row'];
 type Message = Database['public']['Tables']['messages']['Row'];
+type Book = Database['public']['Tables']['books']['Row'];
 
 // Interface for book likes
 export interface BookLike {
@@ -206,8 +207,8 @@ export const checkMatch = async (userId: string, bookId: string): Promise<Match 
     .insert({
       user1_id: userId,
       user2_id: book.owner_id,
-      book1_id: bookId,
-      book2_id: match.liked_book_id
+      book1_id: match.liked_book_id,
+      book2_id: bookId
     })
     .select()
     .single();
@@ -216,15 +217,11 @@ export const checkMatch = async (userId: string, bookId: string): Promise<Match 
   return newMatch;
 };
 
-// Get all matches for a user
+// Get user's matches
 export const getUserMatches = async (userId: string): Promise<Match[]> => {
   const { data, error } = await supabase
     .from('matches')
-    .select(`
-      *,
-      book1:books!matches_book1_id_fkey(*),
-      book2:books!matches_book2_id_fkey(*)
-    `)
+    .select('*')
     .or(`user1_id.eq.${userId},user2_id.eq.${userId}`);
 
   if (error) throw error;

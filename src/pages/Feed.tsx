@@ -116,13 +116,7 @@ const Feed = () => {
               return (
                 <BookCard
                   key={book.id}
-                  id={book.id}
-                  title={book.title}
-                  description={book.description}
-                  imageUrl={book.image_url}
-                  ownerId={book.owner_id}
-                  carbonSaving={book.carbon_saving}
-                  tags={book.tags}
+                  book={book}
                   isLiked={isLiked}
                   isMatched={isMatched}
                   onLike={() => handleLike(book.id)}
